@@ -19,13 +19,15 @@ public class PromptCommand(GeminiClient geminiClient) : AsyncCommand<PromptComma
         {
             if (isThought)
             {
-                AnsiConsole.MarkupLine($"[grey]{part.EscapeMarkup()}[/]");
+                AnsiConsole.Markup($"[grey]{part.EscapeMarkup()}[/]");
                 continue;
             }
 
 
-            AnsiConsole.MarkupLine($"{part.EscapeMarkup()}");
+            AnsiConsole.Markup($"{part.EscapeMarkup()}");
         }
+
+        AnsiConsole.WriteLine();
 
         return 0;
     }

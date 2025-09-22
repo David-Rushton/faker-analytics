@@ -1,44 +1,50 @@
+using Microsoft.AspNetCore.Mvc;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services
     .AddOpenApi()
-    .AddEndpointsApiExplorer();
+    .AddEndpointsApiExplorer()
+    .AddTransient<TradeGenerator>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
-{
     app.MapOpenApi();
-}
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
 
-app.MapGet("/weatherforecast", () =>
+app.MapGet("/api/trades", (
+    [FromQuery] DateTimeOffset from,
+    [FromQuery] DateTimeOffset until,
+    [FromQuery] int? instrumentId,
+    [FromQuery] int? commingleId,
+    [FromQuery] int sequenceId,
+    [FromQuery] int sequenceItemId,
+    [FromQuery] ContractType contractType,
+    [FromServices] TradeGenerator tradeGenerator
+) =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    if (instrumentId is null && commingleId is null)
+        return Results.BadRequest("You must supply either instrumentId or commingleId.");
+
+    if (instrumentId is not null && commingleId is not null)
+        return Results.BadRequest("instrumentId and commingleId are mutually exclusive, you cannot provide both.");
+
+    if (!(from < until))
+        return Results.BadRequest("from must be before until.");
+
+    return Results.Ok(tradeGenerator.Generate(from, until));
 })
-.WithName("GetWeatherForecast");
+.WithName("Trades")
+.WithDescription("""
+    Returns trades.
+
+    1, and only 1, instrumentId and commingleId must be supplied.
+
+    from must be before until.
+""");
 
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
