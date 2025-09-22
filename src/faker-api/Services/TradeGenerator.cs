@@ -36,6 +36,8 @@ public class TradeGenerator
                     currentQuantity
                 );
 
+                currentPrice += _random.NextInt64(-1_000, 1_000) / 100.0m;
+                currentQuantity += _random.NextInt64(-1_000, 1_000) / 100.0m;
                 tradesRequired--;
             }
 

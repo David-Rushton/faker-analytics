@@ -2,9 +2,11 @@
 @from = 2025-04-01T00:00:00Z
 @until = 2025-04-02T00:00:00Z&
 
-GET {{faker_api_HostAddress}}/api/trades/?from={{from}}&until={{until}}&commingleId=12345&sequenceId=12345&sequenceItemId=12345&contractType=Single
+###
+GET {{faker_api_HostAddress}}/api/trades?from={{from}}&until={{until}}&commingleId=12345&sequenceId=12345&sequenceItemId=12345&contractType=Single
 Accept: application/json
 
 
-
 ###
+GET {{faker_api_HostAddress}}/api/trades/ohlc?from={{from}}&until={{until}}&commingleId=12345&sequenceId=12345&sequenceItemId=12345&contractType=Single
+Accept: application/json
