@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
@@ -23,11 +24,14 @@ public class GeminiClient(ILogger<GeminiClientOptions> logger, IOptions<GeminiCl
         }
     };
 
+    // HACK!
+    public List<GeminiTool>? Tools { get; set; }
 
-    public async IAsyncEnumerable<(bool isThought, string text)> GetResponseStream(string prompt)
+
+    public async IAsyncEnumerable<(bool isThought, string? text, GeminiFunctionCall? functionCall)> GetResponseStream(string prompt)
     {
         logger.LogInformation("GeminiClient url: {url}", GeminiClientOptions.Url);
-        logger.LogInformation("GeminiClient initialised with API key: {refactedKey}", options.Value.ApiKey[..4] + "********");
+        logger.LogInformation("GeminiClient initialised with API key: {redactedKey}", options.Value.ApiKey[..4] + "********");
 
         var request = new GeminiRequest
         {
@@ -53,6 +57,10 @@ public class GeminiClient(ILogger<GeminiClientOptions> logger, IOptions<GeminiCl
                     ThinkingBudget = -1,
                     IncludeThoughts = true
                 }
+            },
+            Tools = new()
+            {
+                FunctionDeclarations = this.Tools
             }
         };
 
@@ -62,6 +70,10 @@ public class GeminiClient(ILogger<GeminiClientOptions> logger, IOptions<GeminiCl
             Converters = { new JsonStringEnumConverter() },
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
+
+        // Console.WriteLine("--------------------------------");
+        // Console.WriteLine(JsonSerializer.Serialize(request, jsonOptions));
+        // Console.WriteLine("--------------------------------");
 
         var httpRequest = new HttpRequestMessage(HttpMethod.Post, requestUri: string.Empty)
         {
@@ -73,14 +85,22 @@ public class GeminiClient(ILogger<GeminiClientOptions> logger, IOptions<GeminiCl
             httpRequest,
             HttpCompletionOption.ResponseHeadersRead);
 
-        response.EnsureSuccessStatusCode();
+        if (response.StatusCode != System.Net.HttpStatusCode.OK)
+        {
+            Console.Error.WriteLine(await response.Content.ReadAsStringAsync());
+        }
 
         using var reader = new StreamReader(await response.Content.ReadAsStreamAsync());
         string? line;
 
+        var sb = new StringBuilder();
+
         while ((line = await reader.ReadLineAsync()) != null)
         {
             logger.LogInformation("resp json:\n{json}\n", line ?? string.Empty);
+
+            sb.AppendLine(line);
+            sb.AppendLine("");
 
             if (string.IsNullOrEmpty(line))
                 continue;
@@ -98,6 +118,7 @@ public class GeminiClient(ILogger<GeminiClientOptions> logger, IOptions<GeminiCl
             }
             catch (JsonException e)
             {
+                Console.Error.WriteLine($"Failed to deserialize Gemini response: {e}");
                 logger.LogError(e, "Failed to deserialize Gemini response: {Line}", line);
                 continue;
             }
@@ -112,7 +133,7 @@ public class GeminiClient(ILogger<GeminiClientOptions> logger, IOptions<GeminiCl
                 foreach (var part in candidate.Content.Parts)
                 {
 
-                    yield return (part.Thought, part.Text);
+                    yield return (part.Thought, part.Text, part.FunctionCall);
                     // if (part.Part == GeminiPart.Text && !string.IsNullOrWhiteSpace(part.Text))
                     // {
                     // }
@@ -120,6 +141,24 @@ public class GeminiClient(ILogger<GeminiClientOptions> logger, IOptions<GeminiCl
             }
         }
 
+        // Console.WriteLine("--------------------------------");
+        // Console.WriteLine(sb.ToString());
+        // Console.WriteLine("--------------------------------");
+
         yield break;
+    }
+
+    public void AddTools(string tools)
+    {
+        var jsonOptions = new JsonSerializerOptions
+        {
+            // Add the JsonStringEnumConverter to serialize enums as strings
+            Converters = { new JsonStringEnumConverter() },
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
+        // HACK!
+        var toolsObj = JsonSerializer.Deserialize<IEnumerable<GeminiTool>>(tools, jsonOptions);
+        Tools = toolsObj?.ToList() ?? [];
     }
 }

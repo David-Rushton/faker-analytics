@@ -20,9 +20,7 @@ app.MapGet("/api/trades", (
     [FromQuery] DateTimeOffset until,
     [FromQuery] int? instrumentId,
     [FromQuery] int? commingleId,
-    [FromQuery] int sequenceId,
-    [FromQuery] int sequenceItemId,
-    [FromQuery] ContractType contractType,
+    [FromQuery] int deliveryId,
     [FromServices] TradeGenerator tradeGenerator
 ) =>
 {
@@ -41,19 +39,18 @@ app.MapGet("/api/trades", (
 .WithDescription("""
     Returns trades.
 
-    1, and only 1, instrumentId and commingleId must be supplied.
+    1, and only 1, instrumentId or commingleId must be supplied.
 
     from must be before until.
-""");
+""")
+.Produces<IEnumerable<PublicTrade>>();
 
-app.MapGet("/api/trades/ohlc", (
+app.MapGet("/api/trades/ohlcv", (
     [FromQuery] DateTimeOffset from,
     [FromQuery] DateTimeOffset until,
     [FromQuery] int? instrumentId,
     [FromQuery] int? commingleId,
-    [FromQuery] int sequenceId,
-    [FromQuery] int sequenceItemId,
-    [FromQuery] ContractType contractType,
+    [FromQuery] int deliveryId,
     [FromServices] OhlcvGenerator ohlcvGenerator
 ) =>
 {
@@ -68,14 +65,17 @@ app.MapGet("/api/trades/ohlc", (
 
     return Results.Ok(ohlcvGenerator.Generate(from, until));
 })
-.WithName("Trades OHLC")
+.WithName("Trades OHLCV")
 .WithDescription("""
-    Returns open high low close (OHLC) candles.
+    Returns open high low close volume (OHLCV) candles.
 
-    1, and only 1, instrumentId and commingleId must be supplied.
+    1, and only 1, instrumentId or commingleId must be supplied.
 
     from must be before until.
-""");
+""")
+.Produces<IEnumerable<OhlcvCandle>>();
+
+
 
 
 app.Run();

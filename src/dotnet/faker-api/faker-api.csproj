@@ -11,4 +11,8 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0-rc.1.25451.107" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\tool-discovery-service.abstractions\tool-discovery-service.abstractions.csproj" />
+  </ItemGroup>
+
 </Project>

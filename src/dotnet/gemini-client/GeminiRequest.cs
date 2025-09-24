@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
+using Microsoft.VisualBasic;
 
 namespace Dr.Gemini;
 
@@ -7,6 +8,7 @@ internal class GeminiRequest
 {
     public required List<GeminiContent> Contents { get; init; }
     public required GenerationConfig GenerationConfig { get; set; }
+    public required GeminiTools Tools { get; set; }
 }
 
 public class GenerationConfig
@@ -28,8 +30,25 @@ internal class GeminiContent
 
 internal class GeminiContentPart
 {
-    public required string Text { get; init; }
+    public string? Text { get; init; }
+    public GeminiFunctionCall? FunctionCall { get; init; }
     public bool Thought { get; set; }
+    public string? ThoughtSignature { get; init; }
+}
+
+public class GeminiFunctionCall
+{
+    public required string Name { get; init; }
+    public required Dictionary<string, object> Args { get; init; }
+
+    public override string ToString()
+    {
+        var flatArgs = string.Join(
+            ",",
+            Args.Select(kvp => $"[{kvp.Key}: {kvp.Value}]"));
+
+        return $"{{ FunctionCall {{ Name = {Name}, Args = {flatArgs} }} }}";
+    }
 }
 
 public enum GeminiRole { User, System, Model }

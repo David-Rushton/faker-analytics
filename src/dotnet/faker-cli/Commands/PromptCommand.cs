@@ -15,16 +15,23 @@ public class PromptCommand(GeminiClient geminiClient) : AsyncCommand<PromptComma
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
-        await foreach (var (isThought, part) in geminiClient.GetResponseStream(settings.Prompt))
+        await foreach (var (isThought, part, functionCall) in geminiClient.GetResponseStream(settings.Prompt))
         {
             if (isThought)
             {
                 AnsiConsole.Markup($"[grey]{part.EscapeMarkup()}[/]");
+            }
+
+            if (functionCall is not null)
+            {
+                AnsiConsole.Markup($"[green]{functionCall.ToString().EscapeMarkup()}[/]");
                 continue;
             }
 
-
-            AnsiConsole.Markup($"{part.EscapeMarkup()}");
+            if (string.IsNullOrEmpty(part))
+            {
+                AnsiConsole.Markup($"{part.EscapeMarkup()}");
+            }
         }
 
         AnsiConsole.WriteLine();

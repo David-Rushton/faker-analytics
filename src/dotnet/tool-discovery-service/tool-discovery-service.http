@@ -1,0 +1,6 @@
+@tool_discovery_service_HostAddress = http://localhost:5065
+
+GET {{tool_discovery_service_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

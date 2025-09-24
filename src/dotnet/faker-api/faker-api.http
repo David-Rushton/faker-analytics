@@ -10,3 +10,7 @@ Accept: application/json
 ###
 GET {{faker_api_HostAddress}}/api/trades/ohlc?from={{from}}&until={{until}}&commingleId=12345&sequenceId=12345&sequenceItemId=12345&contractType=Single
 Accept: application/json
+
+###
+GET {{faker_api_HostAddress}}/openapi/v1.json
+Accept: application/json

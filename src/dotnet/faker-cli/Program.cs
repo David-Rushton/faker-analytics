@@ -39,11 +39,12 @@ app.Configure(config =>
 
 
 
-
-
     config.AddCommand<PromptCommand>("prompt")
         .WithDescription("Get a response from the Gemini model for a given prompt.");
+
+
+    config.AddCommand<DiscoCommand>("disco")
+        .WithDescription("Build tools.");
 });
 
 await app.RunAsync(args);
-
