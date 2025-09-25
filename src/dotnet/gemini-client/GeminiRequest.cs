@@ -1,14 +1,12 @@
-using System.Runtime.InteropServices;
-using System.Text.Json.Serialization;
-using Microsoft.VisualBasic;
+using Dr.ToolDiscoveryService.Abstractions;
 
-namespace Dr.Gemini;
+namespace Dr.GeminiClient;
 
 internal class GeminiRequest
 {
     public required List<GeminiContent> Contents { get; init; }
     public required GenerationConfig GenerationConfig { get; set; }
-    public required GeminiTools Tools { get; set; }
+    public required List<Tool> Tools { get; set; }
 }
 
 public class GenerationConfig

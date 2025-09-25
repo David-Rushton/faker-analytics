@@ -1,4 +1,4 @@
-namespace Dr.Gemini;
+namespace Dr.GeminiClient;
 
 internal class GeminiResponse
 {

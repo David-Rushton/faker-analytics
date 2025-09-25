@@ -1,11 +1,11 @@
-using Dr.Gemini;
+using Dr.GeminiClient;
 using Markdig;
 using Microsoft.Extensions.Logging;
 using Spectre.Console.Cli;
 
 namespace Dr.FakerAnalytics.Cli.Commands;
 
-public class PromptCommand(GeminiClient geminiClient) : AsyncCommand<PromptCommand.Settings>
+public class PromptCommand(GeminiClient.GeminiClient geminiClient) : AsyncCommand<PromptCommand.Settings>
 {
     public class Settings : CommandSettings
     {

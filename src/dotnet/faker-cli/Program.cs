@@ -1,10 +1,7 @@
 ﻿using Dr.FakerAnalytics.Cli.Infrastructure;
-using Dr.Gemini;
+using Dr.GeminiClient.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Spectre.Console.Cli;
 
 var configuration = new ConfigurationBuilder()
@@ -15,17 +12,10 @@ var configuration = new ConfigurationBuilder()
 var services = new ServiceCollection();
 
 services
-    .AddLogging(configure => configure.AddDebug());
-
-services
-    .AddOptions<GeminiClientOptions>()
-    .BindConfiguration("GeminiClient")
-    .ValidateOnStart();
-
-services
+    .AddGeminiClient()
     .AddSingleton<IConfiguration>(configuration)
-    .AddSingleton<GeminiClient>()
-    .AddSingleton<PromptCommand>();
+    .AddSingleton<PromptCommand>()
+    .AddLogging(configure => configure.AddDebug());
 
 var registrar = new TypeRegistrar(services);
 
@@ -37,14 +27,8 @@ app.Configure(config =>
     config.CaseSensitivity(CaseSensitivity.None);
     config.PropagateExceptions();
 
-
-
     config.AddCommand<PromptCommand>("prompt")
         .WithDescription("Get a response from the Gemini model for a given prompt.");
-
-
-    config.AddCommand<DiscoCommand>("disco")
-        .WithDescription("Build tools.");
 });
 
 await app.RunAsync(args);

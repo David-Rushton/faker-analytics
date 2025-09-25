@@ -1,33 +1,32 @@
-
-using Dr.ToolDiscoveryService.Abstractions;
-
 namespace Dr.FakerAnalytics.Api;
 
 public class ToolAdvertisingService(
     ILogger<ToolAdvertisingService> logger,
-    IHostLifetime hostLifetime,
+    IHttpClientFactory httpClientFactory,
     IWebHostEnvironment webEnvironment) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        try
-        {
-            var tradeTool = GetTradeTool();
-            var ohlcvTool = GetOhlcvTool();
+        Tool[] tools = [GetTradeTool(), GetOhlcvTool()];
+        var httpClient = httpClientFactory.CreateClient("tool-discovery-service");
 
-            while (!stoppingToken.IsCancellationRequested)
+        logger.LogInformation("Starting tool advertising service.");
+
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            try
             {
-                logger.LogInformation("Starting tool discovery service.");
-                throw new NotImplementedException();
-
-                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+                foreach (var tool in tools)
+                {
+                    await httpClient.PutAsJsonAsync<Tool>($"/api/tools/{tool.Name}", tool, stoppingToken);
+                }
             }
-        }
-        catch (Exception e)
-        {
-            logger.LogError("Tool discovery service failed: {err}", e);
-            Environment.ExitCode = 1;
-            await hostLifetime.StopAsync(stoppingToken);
+            catch (Exception e)
+            {
+                logger.LogError(e, "Tool advertising failed");
+            }
+
+            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
         }
     }
 

@@ -1,6 +1,12 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddProject<Projects.faker_api>("faker-api")
-    .WithExternalHttpEndpoints();
+var toolDiscoveryService = builder.AddProject<Projects.tool_discovery_service>("tool-discovery-service")
+    .WithExternalHttpEndpoints()
+    .WithHttpHealthCheck("/health");
+
+var fakerApi = builder.AddProject<Projects.faker_api>("faker-api")
+    .WithExternalHttpEndpoints()
+    .WithReference(toolDiscoveryService)
+    .WithHttpHealthCheck("/health");
 
 builder.Build().Run();

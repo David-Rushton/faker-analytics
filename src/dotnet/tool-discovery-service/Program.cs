@@ -1,10 +1,11 @@
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
-
 builder.Services
     .AddOpenApi()
-    .AddEndpointsApiExplorer();
+    .AddEndpointsApiExplorer()
+    .AddFakerAnalyticsServices();
+
+builder.AddServiceDefaults();
 
 var app = builder.Build();
 

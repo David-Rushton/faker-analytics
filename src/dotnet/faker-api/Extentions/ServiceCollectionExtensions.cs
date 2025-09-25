@@ -6,7 +6,17 @@ public static class ServiceCollectionExtensions
     {
         services
             .AddTransient<TradeGenerator>()
-            .AddTransient<OhlcvGenerator>();
+            .AddTransient<OhlcvGenerator>()
+            .AddHostedService<ToolAdvertisingService>();
+
+        services.AddHttpClient("tool-discovery-service", client =>
+        {
+            client.BaseAddress = new Uri("http://tool-discovery-service");
+        });
+
+        services.AddHealthChecks()
+            .AddCheck("faker-api-ready", () =>
+                Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("Faker API is ready"));
 
         return services;
     }

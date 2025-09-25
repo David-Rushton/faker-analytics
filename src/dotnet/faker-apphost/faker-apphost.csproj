@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\faker-api\faker-api.csproj" />
+    <ProjectReference Include="..\tool-discovery-service\tool-discovery-service.csproj" />
   </ItemGroup>
 
 </Project>

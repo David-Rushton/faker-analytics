@@ -1,15 +1,21 @@
-﻿using System.Net.Http.Json;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using Dr.ToolDiscoveryService.Abstractions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Dr.Gemini;
+namespace Dr.GeminiClient;
 
 public class GeminiClientOptions
 {
     internal static string Url => "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse";
+
+    [MinLength(32)]
     public required string ApiKey { get; init; }
 }
 
@@ -25,44 +31,38 @@ public class GeminiClient(ILogger<GeminiClientOptions> logger, IOptions<GeminiCl
     };
 
     // HACK!
-    public List<GeminiTool>? Tools { get; set; }
-
+    public List<Tool> Tools { get; set; } = new();
 
     public async IAsyncEnumerable<(bool isThought, string? text, GeminiFunctionCall? functionCall)> GetResponseStream(string prompt)
     {
         logger.LogInformation("GeminiClient url: {url}", GeminiClientOptions.Url);
-        logger.LogInformation("GeminiClient initialised with API key: {redactedKey}", options.Value.ApiKey[..4] + "********");
+        logger.LogInformation("GeminiClient xxx: {url}", GeminiClientOptions.Url);
+        logger.LogInformation("GeminiClient api key");
 
-        var request = new GeminiRequest
+        var request = new JsonObject
         {
-            Contents = new List<GeminiContent>
+            ["contents"] = new JsonObject
             {
-                new()
+                ["role"] = GeminiRole.User.ToString(),
+                ["parts"] = new JsonArray
                 {
-                    Role = GeminiRole.User,
-                    Parts = new List<GeminiContentPart>
+                    new JsonObject
                     {
-                        new()
-                        {
-                            // Part = GeminiPart.Text,
-                            Text = prompt
-                        }
+                        ["text"] = prompt
                     }
                 }
             },
-            GenerationConfig = new()
+            ["generationConfig"] = new JsonObject
             {
-                ThinkingConfig = new()
+                ["thinkingConfig"] = new JsonObject
                 {
-                    ThinkingBudget = -1,
-                    IncludeThoughts = true
+                    ["thinkingBudget"] = -1,
+                    ["includeThoughts"] = true
                 }
             },
-            Tools = new()
-            {
-                FunctionDeclarations = this.Tools
-            }
+            ["tools"] = new JsonArray(Tools.Select(t => t.ToolDefinition.Definition).ToArray())
         };
+
 
         var jsonOptions = new JsonSerializerOptions
         {
@@ -146,19 +146,5 @@ public class GeminiClient(ILogger<GeminiClientOptions> logger, IOptions<GeminiCl
         // Console.WriteLine("--------------------------------");
 
         yield break;
-    }
-
-    public void AddTools(string tools)
-    {
-        var jsonOptions = new JsonSerializerOptions
-        {
-            // Add the JsonStringEnumConverter to serialize enums as strings
-            Converters = { new JsonStringEnumConverter() },
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
-
-        // HACK!
-        var toolsObj = JsonSerializer.Deserialize<IEnumerable<GeminiTool>>(tools, jsonOptions);
-        Tools = toolsObj?.ToList() ?? [];
     }
 }

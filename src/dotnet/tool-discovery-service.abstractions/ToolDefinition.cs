@@ -1,9 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace Dr.ToolDiscoveryService.Abstractions;
 
-public class ToolDefinition(string name, string description, JsonObject definition)
+public class ToolDefinition
 {
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -12,11 +13,22 @@ public class ToolDefinition(string name, string description, JsonObject definiti
         IndentCharacter = ' '
     };
 
-    public string Name => name;
-    public string Description => description;
+    [JsonConstructor]
+    public ToolDefinition(string name, string description, JsonObject definition)
+    {
+        Name = name;
+        Description = description;
+        Definition = definition;
+    }
+
+    public string Name { get; }
+    public string Description { get; }
+
+    [JsonPropertyName("definition")]
+    public JsonObject Definition { get; }
 
     public string ToJson(bool pretty = false) =>
         pretty
-            ? JsonSerializer.Serialize(definition, _jsonOptions).Replace("\r", string.Empty)
-            : definition.ToJsonString();
+            ? JsonSerializer.Serialize(Definition, _jsonOptions).Replace("\r", string.Empty)
+            : Definition.ToJsonString();
 }

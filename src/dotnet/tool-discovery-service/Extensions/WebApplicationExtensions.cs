@@ -48,13 +48,15 @@ public static class WebApplicationExtensions
 
             return Results.Ok();
         })
-        .WithName("Tools")
+        .WithName("PutTool")
         .WithDescription("""
 Adds or updates a tool within the discovery service.
 
 All tools should periodically call this endpoint to prevent the tool from being marketed as stale
 and removed from the service.
-""");
+""")
+        .Produces(200)
+        .Produces(400);
 
         return app;
     }
@@ -62,17 +64,17 @@ and removed from the service.
     private static WebApplication AddGetToolsEndpoint(this WebApplication app)
     {
         app.MapGet("/api/tools", (
-            string toolName,
             [FromServices] ILogger<Program> logger,
             [FromServices] ToolsService toolsService
         ) =>
         {
             logger.LogInformation("GET /api/tools request received.");
 
-            Results.Ok(toolsService.List());
+            return Results.Ok(toolsService.List());
         })
-        .WithName("Tools")
-        .WithDescription("Lists all tools registered with the discovery service.");
+        .WithName("GetTools")
+        .WithDescription("Lists all tools registered with the discovery service.")
+        .Produces<Tool[]>(200);
 
         return app;
     }
@@ -91,8 +93,10 @@ and removed from the service.
                 ? Results.Ok(tool)
                 : Results.NotFound();
         })
-        .WithName("Tools")
-        .WithDescription("Details a tool registered with the discovery service.");
+        .WithName("GetTool")
+        .WithDescription("Details a tool registered with the discovery service.")
+        .Produces<Tool>(200)
+        .Produces(404);
 
         return app;
     }
