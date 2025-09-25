@@ -13,8 +13,8 @@ if (-not (Test-Path $envFile)) {
 }
 
 # It must contain a Gemini API key.
-$envFileContent = Get-Content -Path $envFile -Raw | Select-String "GeminiClient:ApiKey=[A-z0-9]{32,}"
-if ($null -eq $envFileContent) {
+$geminiApiKey = Get-Content -Path $envFile -Raw | Select-String "GeminiClient:ApiKey=[A-z0-9]{32,}"
+if ($null -eq $geminiApiKey) {
     Write-Warning "Required Gemini API key is missing from .env file."
     Write-Warning " - Log into Google Cloud https://cloud.google.com/?hl=en"
     Write-Warning " - Create a key"
@@ -23,7 +23,7 @@ if ($null -eq $envFileContent) {
     $errors++
 }
 
-# We need docker.
+# We need Docker.
 try {
     docker info *>$null
 } catch {
@@ -32,8 +32,41 @@ try {
     $errors++
 }
 
+# We need .Net.
+try {
+    dotnet *>$null
+
+    $sdkFound = dotnet --list-sdks | Select-String 10\.0\.100-rc
+    if ($null -eq $sdkFound) {
+        Write-Warning ".Net 10.0.100 or higher is required"
+        Write-Warning " - Visit: https://dotnet.microsoft.com/en-us/download"
+
+        $errors++
+    }
+
+    # Aspire needs our Gemini key.
+    if (-not ($null -eq $geminiApiKey)) {
+        try {
+            Push-Location "$PSScriptRoot/../src/dotnet/faker-apphost/"
+            dotnet user-secrets set "GeminiClient:ApiKey" $geminiApiKey.Matches[0].Value.Replace("GeminiClient:ApiKey", "") | Out-Null
+            Pop-Location
+        }
+        catch {
+            Write-Warning "Cannot write Gemini API to dotnet secrets because $_"
+            $errors++
+        }
+    }
+
+} catch {
+    Write-Warning ".Net is required"
+    Write-Warning " - Visit: https://dotnet.microsoft.com/en-us/download"
+
+    $errors++
+}
 
 # Wrap up.
 if ($errors -eq 0) {
-    Write-Host "Your local environment is ready to go"
+    Write-Host "✅ You are ready to go!"
+} else {
+    Write-Error "❌ Please fix the warnings above"
 }

@@ -1,35 +1,81 @@
 # Faker Analytics
 
-I created this project to develop a deeper understanding of the following:
+I built this to explore:
 
-- How to integrate generative AI into imperative applications
-- How to provide generative AI with a series of tools to argument its capabilities
-- How to extend a traditional application with generative AI features
+- Integrating generative AI into traditional applications
+- Providing AI with tools to augment its capabilities  
+- Extending existing apps with AI features
 
-My "traditional application" is called `faker-analytics`.  It is a collection of APIs, that provide
-insights into the energy trading market.  All of the data is fake - hence the name.  The various APIs
-cover only basic functionality, as building a true analytics system is not the aim here.
+The "traditional application" is `faker-analytics` - a collection of APIs providing energy trading 
+market insights. All data is fake (hence the name). The APIs cover basic functionality since building
+a true analytics system isn't the goal here.
 
-You can track my progress in the [blog](./blog/)
+I'm keeping a [blog](./blog/), so you can track my progress.
 
 ## Getting Started
 
-The easiest way to start is by running this script.  If anything is missing from your local machine
-the script will explain what is missing, and how to fix it.
+1. Check the [prerequisites](#prerequisites)
 
 ```pwsh
-# The name pretty much covers it.
 ./scripts/Test-Prerequisites.ps1
 ```
 
-### Gemini API Key
+2. Start the services
 
-You will need a Gemini API key.  These can be generated in Google AI Studio or Google Cloud.
-Instructions for both can be found [here](https://ai.google.dev/gemini-api/docs/api-key).
+Using [Aspire](https://learn.microsoft.com/en-us/dotnet/aspire/get-started/aspire-overview), an 
+orchestration system designed to simplify building and deploying distributed applications, especially
+for local environments.
 
-### Docker 
+```pwsh
+# Output includes a dashboard link for viewing logs, metrics, and traces
+dotnet run ./src/dotnet/faker-apphost/ --profile http
+```
 
-You will need [Docker](https://docs.docker.com/engine/install/).
+> **PRO TIP**: The dashboard supports Copilot!  
+> Log into [GitHub Copilot] via Visual Studio or VS Code, then start the app host project from the editor.
 
-I haven't tested with Podman, Rancher or any of the other alternatives.  But in theory there is no
-reason why they shouldn't work.
+3. Chat with the CLI
+
+```pwsh
+./scripts/fa prompt "what can you do?"
+
+# Perhaps you have more to say?
+./scripts/fa prompt "
+
+I would like to see all trades from Nov last year.  For Dutch natural gas.  With delivery in the next
+month.
+
+"
+```
+
+### Prerequisites
+
+Apologies.  This is a longer list than I would like.  But this repo is an experiment.  Generating 
+something that is easy to consume isn't really the point. 
+
+#### Gemini API Key
+
+You'll need a Gemini API key from Google AI Studio or Google Cloud.
+Get one [here](https://ai.google.dev/gemini-api/docs/api-key).
+
+#### Docker 
+
+You'll need [Docker](https://docs.docker.com/engine/install/).
+
+Untested with Podman or Rancher, but they should work.
+
+#### .Net
+
+You'll need [.NET](https://dotnet.microsoft.com/en-us/download) `10.0.100-RC1` or higher.
+
+In theory .Net 8.0 or higher should work.  But I haven't tested it.
+
+## PowerShell 
+
+You'll need [PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.5).
+
+Any recent version works. Really old versions __probably__ work.
+
+<!-- links -->
+
+[GitHub Copilot]: https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/dashboard/copilot

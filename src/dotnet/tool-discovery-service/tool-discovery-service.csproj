@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\tool-discovery-service.abstractions\tool-discovery-service.abstractions.csproj" />
+    <ProjectReference Include="..\faker-servicedefaults\faker-servicedefaults.csproj" />
   </ItemGroup>
 
 </Project>

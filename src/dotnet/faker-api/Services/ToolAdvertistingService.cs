@@ -19,6 +19,8 @@ public class ToolAdvertisingService(
             {
                 logger.LogInformation("Starting tool discovery service.");
                 throw new NotImplementedException();
+
+                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
             }
         }
         catch (Exception e)
