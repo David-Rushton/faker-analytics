@@ -10,7 +10,7 @@ public static class ServiceCollectionExtensions
             .ValidateOnStart();
 
         services
-            .AddTransient<ToolsService>()
+            .AddSingleton<ToolsService>()
             .AddHostedService<ToolExpiryService>();
 
         // Add health checks for tool-discovery-service

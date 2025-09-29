@@ -1,5 +1,4 @@
 ﻿using Dr.FakerAnalytics.Cli.Infrastructure;
-using Dr.GeminiClient.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console.Cli;
@@ -12,10 +11,19 @@ var configuration = new ConfigurationBuilder()
 var services = new ServiceCollection();
 
 services
-    .AddGeminiClient()
     .AddSingleton<IConfiguration>(configuration)
     .AddSingleton<PromptCommand>()
-    .AddLogging(configure => configure.AddDebug());
+    .AddSingleton<ToolExecutor>()
+    .AddLogging(configure => configure.AddDebug())
+    .AddHttpClient("tool-discovery-service", client =>
+    {
+        client.BaseAddress = new Uri("http://localhost:5065");
+    });
+
+services
+    .AddOptions<GenAiOptions>()
+    .BindConfiguration(GenAiOptions.Name)
+    .ValidateOnStart();
 
 var registrar = new TypeRegistrar(services);
 

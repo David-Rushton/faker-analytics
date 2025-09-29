@@ -1,11 +1,18 @@
+using System.ComponentModel;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Dr.GeminiClient;
+using Dr.ToolDiscoveryService.Abstractions;
 using Markdig;
-using Microsoft.Extensions.Logging;
 using Spectre.Console.Cli;
 
 namespace Dr.FakerAnalytics.Cli.Commands;
 
-public class PromptCommand(GeminiClient.GeminiClient geminiClient) : AsyncCommand<PromptCommand.Settings>
+public class PromptCommand(
+    IOptions<GenAiOptions> options,
+    ToolExecutor toolExecutor,
+    IHttpClientFactory httpClientFactory) : AsyncCommand<PromptCommand.Settings>
 {
     public class Settings : CommandSettings
     {
@@ -15,22 +22,44 @@ public class PromptCommand(GeminiClient.GeminiClient geminiClient) : AsyncComman
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
-        await foreach (var (isThought, part, functionCall) in geminiClient.GetResponseStream(settings.Prompt))
+
+        var conversation = Conversation.Create(options.Value.ApiKey);
+        var toolsClient = httpClientFactory.CreateClient("tool-discovery-service");
+        var tools = await toolsClient.GetFromJsonAsync<List<Tool>>("/api/tools");
+        if (tools is not null && tools.Count != 0)
+            conversation.Tools = tools;
+
+        await foreach (var response in conversation.Ask(settings.Prompt))
         {
-            if (isThought)
+            switch (response)
             {
-                AnsiConsole.Markup($"[grey]{part.EscapeMarkup()}[/]");
-            }
+                case TextResponse textResponse:
+                    AnsiConsole.MarkupLineInterpolated($"[yellow]{textResponse.Text}[/]");
+                    break;
 
-            if (functionCall is not null)
-            {
-                AnsiConsole.Markup($"[green]{functionCall.ToString().EscapeMarkup()}[/]");
-                continue;
-            }
+                case ThoughtResponse thoughtResponse:
+                    AnsiConsole.MarkupLineInterpolated($"[green]{thoughtResponse.Thought}[/]");
+                    break;
 
-            if (string.IsNullOrEmpty(part))
-            {
-                AnsiConsole.Markup($"{part.EscapeMarkup()}");
+                case FunctionCallResponse functionCallResponse:
+                    AnsiConsole.MarkupLineInterpolated($"[purple]{functionCallResponse.Name} {functionCallResponse.GetJsonArgs()}[/]");
+
+                    var tool = tools!.First(t => t.Name == functionCallResponse.Name);
+
+                    if (tool is null)
+                        throw new InvalidOperationException("Unsupported tool requested");
+
+                    var toolResponse = await toolExecutor.ExecuteAsync(
+                        tool,
+                        functionCallResponse.GetJsonArgs(),
+                        CancellationToken.None);
+
+                    // Console.WriteLine(toolResponse);
+
+                    break;
+
+                default:
+                    throw new NotSupportedException($"Unknown response type: {nameof(response)}");
             }
         }
 

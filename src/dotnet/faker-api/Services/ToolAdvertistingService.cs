@@ -3,7 +3,7 @@ namespace Dr.FakerAnalytics.Api;
 public class ToolAdvertisingService(
     ILogger<ToolAdvertisingService> logger,
     IHttpClientFactory httpClientFactory,
-    IWebHostEnvironment webEnvironment) : BackgroundService
+    IConfiguration configuration) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -30,6 +30,23 @@ public class ToolAdvertisingService(
         }
     }
 
+    private string GetServiceBaseUrl()
+    {
+        // For external consumers (like CLI tools), use localhost
+        // For internal Aspire services, they'll use service discovery
+        var urls = configuration.GetValue<string>("ASPNETCORE_URLS") ?? "http://localhost:5000";
+
+        // Extract the first HTTP URL for external access
+        var firstUrl = urls.Split(';').FirstOrDefault(u => u.StartsWith("http://"));
+        if (firstUrl != null)
+        {
+            return firstUrl;
+        }
+
+        // Fallback to localhost if we can't determine the URL
+        return "http://localhost:5000";
+    }
+
     private Tool GetOhlcvTool()
     {
         var OhlcvDescription = """
@@ -42,26 +59,22 @@ from must be before until.
 Supported instrumentId, commingleId and deliveryId values are documented in the /api/metadata endpoints.
 """;
         var ohlcvDefinition = new ToolDefinitionBuilder()
-                .WithName("Trades")
+                .WithName("OHLCV")
                 .WithDescription(OhlcvDescription)
                 .WithParameters(p => p
-                    .WithRequiredProperty("from", p => p
+                    .WithRequiredProperty("from", prop => prop
                         .WithType("string")
-                        .WithDescription("Inclusive start date time.  Use RFC3339 format.  Must be before until.")))
-                .WithParameters(p => p
-                    .WithRequiredProperty("until", p => p
+                        .WithDescription("Inclusive start date time.  Use RFC3339 format.  Must be before until."))
+                    .WithRequiredProperty("until", prop => prop
                         .WithType("string")
-                        .WithDescription("Exclusive end date time.  Use RFC3339 format.  Must be after from.")))
-                .WithParameters(p => p
-                    .WithProperty("instrumentId", p => p
+                        .WithDescription("Exclusive end date time.  Use RFC3339 format.  Must be after from."))
+                    .WithProperty("instrumentId", prop => prop
                         .WithType("number")
-                        .WithDescription("The instrument to query.  Cannot be combined with commingleId.")))
-                .WithParameters(p => p
-                    .WithProperty("commingleId", p => p
+                        .WithDescription("The instrument to query.  Cannot be combined with commingleId."))
+                    .WithProperty("commingleId", prop => prop
                         .WithType("number")
-                        .WithDescription("The market to query.  Each commingled market contains 1 or more related instruments.  Cannot be combined with instrumentId.")))
-                .WithParameters(p => p
-                    .WithProperty("deliveryId", p => p
+                        .WithDescription("The market to query.  Each commingled market contains 1 or more related instruments.  Cannot be combined with instrumentId."))
+                    .WithProperty("deliveryId", prop => prop
                         .WithType("number")
                         .WithDescription("Describes how the instrument, or in the case of a commingled market instruments, will be delivered.")))
                 .Build();
@@ -72,7 +85,7 @@ Supported instrumentId, commingleId and deliveryId values are documented in the 
             ToolRoute = new()
             {
                 HttpRequestMethod = HttpRequestMethod.Get,
-                Uri = new Uri($"{webEnvironment.ContentRootPath}/api/trades/ohlcv")
+                Uri = new Uri($"{GetServiceBaseUrl()}/api/trades/ohlcv")
             }
         };
     }
@@ -94,23 +107,19 @@ Supported instrumentId, commingleId and deliveryId values are documented in the 
                 .WithName("Trades")
                 .WithDescription(tradesDescription)
                 .WithParameters(p => p
-                    .WithRequiredProperty("from", p => p
+                    .WithRequiredProperty("from", prop => prop
                         .WithType("string")
-                        .WithDescription("Inclusive start date time.  Use RFC3339 format.  Must be before until.")))
-                .WithParameters(p => p
-                    .WithRequiredProperty("until", p => p
+                        .WithDescription("Inclusive start date time.  Use RFC3339 format.  Must be before until."))
+                    .WithRequiredProperty("until", prop => prop
                         .WithType("string")
-                        .WithDescription("Exclusive end date time.  Use RFC3339 format.  Must be after from.")))
-                .WithParameters(p => p
-                    .WithProperty("instrumentId", p => p
+                        .WithDescription("Exclusive end date time.  Use RFC3339 format.  Must be after from."))
+                    .WithProperty("instrumentId", prop => prop
                         .WithType("number")
-                        .WithDescription("The instrument to query.  Cannot be combined with commingleId.")))
-                .WithParameters(p => p
-                    .WithProperty("commingleId", p => p
+                        .WithDescription("The instrument to query.  Cannot be combined with commingleId."))
+                    .WithProperty("commingleId", prop => prop
                         .WithType("number")
-                        .WithDescription("The market to query.  Each commingled market contains 1 or more related instruments.  Cannot be combined with instrumentId.")))
-                .WithParameters(p => p
-                    .WithProperty("deliveryId", p => p
+                        .WithDescription("The market to query.  Each commingled market contains 1 or more related instruments.  Cannot be combined with instrumentId."))
+                    .WithProperty("deliveryId", prop => prop
                         .WithType("number")
                         .WithDescription("Describes how the instrument, or in the case of a commingled market instruments, will be delivered.")))
                 .Build();
@@ -121,7 +130,7 @@ Supported instrumentId, commingleId and deliveryId values are documented in the 
             ToolRoute = new()
             {
                 HttpRequestMethod = HttpRequestMethod.Get,
-                Uri = new Uri($"{webEnvironment.ContentRootPath}/api/trades")
+                Uri = new Uri($"{GetServiceBaseUrl()}/api/trades")
             }
         };
     }

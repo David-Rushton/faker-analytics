@@ -7,18 +7,18 @@ $errors = 0
 $envFile = "$PSScriptRoot/../.env"
 if (-not (Test-Path $envFile)) {
     Write-Warning "Required .env file not found.  Creating."
-    New-Item $envFile -ItemType File -Value "GeminiClient__ApiKey=<Your-Key-Here>"
+    New-Item $envFile -ItemType File -Value "GenAi__ApiKey=<Your-Key-Here>"
 
     $errors++
 }
 
 # It must contain a Gemini API key.
-$geminiApiKey = Get-Content -Path $envFile -Raw | Select-String "GeminiClient__ApiKey=[A-z0-9]{32,}"
+$geminiApiKey = Get-Content -Path $envFile -Raw | Select-String "GenAi__ApiKey=[A-z0-9]{32,}"
 if ($null -eq $geminiApiKey) {
     Write-Warning "Required Gemini API key is missing from .env file."
     Write-Warning " - Log into Google Cloud https://cloud.google.com/?hl=en"
     Write-Warning " - Create a key"
-    Write-Warning " - Add it to .env: GeminiClient__ApiKey=<Your-Key-Here>"
+    Write-Warning " - Add it to .env: GenAi__ApiKey=<Your-Key-Here>"
 
     $errors++
 }

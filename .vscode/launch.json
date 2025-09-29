@@ -17,7 +17,7 @@
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/src/dotnet/faker-cli/bin/Debug/net10.0/faker-cli.dll",
             "args": [
-                "prompt", "\"I would like to view all trades from November of 2024.  On instrument 1234, delivery 1234.\""
+                "prompt", "\"I would like to see all trades from November of 2024.  On instrumentId 1234, deliveryId 1234.\""
             ],
             "envFile": "${workspaceFolder}/.env",
             "cwd": "${workspaceFolder}",

@@ -1,5 +1,6 @@
 namespace Dr.ToolDiscoveryService.Services;
 
+using System.Collections.Concurrent;
 using ToolRegistration = (DateTimeOffset expires, Tool tool);
 
 public class ToolsServiceOptions
@@ -22,7 +23,7 @@ public class ToolsService(
     IOptions<ToolsServiceOptions> options,
     TimeProvider timeProvider)
 {
-    private readonly Dictionary<string, ToolRegistration> _registeredTools = new();
+    private readonly ConcurrentDictionary<string, ToolRegistration> _registeredTools = new();
 
     public IEnumerable<Tool> List()
     {
@@ -43,7 +44,7 @@ public class ToolsService(
             return true;
         }
 
-        logger.LogInformation("Discovery service could not find tool {toolName}.", registration.tool.Name);
+        logger.LogInformation("Discovery service could not find tool {toolName}.", name);
 
         tool = null;
         return false;
@@ -84,6 +85,8 @@ public class ToolsService(
         }
 
         foreach (var item in expired)
-            _registeredTools.Remove(item);
+            _registeredTools.TryRemove(item, out _);
+
+        logger.LogInformation("After expiry checks; {toolCount} tools are available.", _registeredTools.Count());
     }
 }

@@ -49,7 +49,7 @@ public class ToolDefinitionBuilder
 
         var definition = new JsonObject
         {
-            ["name"] = _name,
+            ["name"] = _name.ToLowerInvariant(),
             ["description"] = _description
         };
 

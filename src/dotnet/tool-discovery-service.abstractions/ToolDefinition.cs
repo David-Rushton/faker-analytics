@@ -16,7 +16,7 @@ public class ToolDefinition
     [JsonConstructor]
     public ToolDefinition(string name, string description, JsonObject definition)
     {
-        Name = name;
+        Name = name.ToLowerInvariant();
         Description = description;
         Definition = definition;
     }

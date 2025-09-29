@@ -1,7 +1,8 @@
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text.Json.Nodes;
 
-namespace Dr.FakerAnalytics.Api.Tools;
+namespace Dr.FakerAnalytics.Cli.Tools;
 
 /// <summary>
 /// Executes any tool registered with the Tool Discovery Service.
@@ -21,7 +22,7 @@ public class ToolExecutor
     };
 
     // TODO: Maybe execute tool by name -> fetch from disco?
-    public async Task<JsonObject> ExecuteAsync(Tool tool, JsonObject jsonParameters, CancellationToken cancellationToken) =>
+    public async Task<JsonNode> ExecuteAsync(Tool tool, JsonNode jsonParameters, CancellationToken cancellationToken) =>
         await (tool.ToolRoute.HttpRequestMethod switch
         {
             HttpRequestMethod.Get => ExecuteGetAsync(tool, jsonParameters, cancellationToken),
@@ -30,7 +31,7 @@ public class ToolExecutor
             _ => throw new ArgumentOutOfRangeException(nameof(ToolRoute.HttpRequestMethod))
         });
 
-    private async Task<JsonObject> ExecuteGetAsync(Tool tool, JsonObject jsonParameters, CancellationToken cancellationToken)
+    private async Task<JsonNode> ExecuteGetAsync(Tool tool, JsonNode jsonParameters, CancellationToken cancellationToken)
     {
 
         try
@@ -45,7 +46,8 @@ public class ToolExecutor
             if (string.IsNullOrEmpty(jsonContent))
                 return new JsonObject();
 
-            return (JsonObject?)JsonNode.Parse(jsonContent) ?? new JsonObject();
+            // TODO: Nullable here?
+            return JsonNode.Parse(jsonContent)!;
         }
         catch
         {
@@ -54,7 +56,7 @@ public class ToolExecutor
         }
     }
 
-    private async Task<JsonObject> ExecutePostAsync(Tool tool, JsonObject jsonParameters, CancellationToken cancellationToken)
+    private async Task<JsonNode> ExecutePostAsync(Tool tool, JsonNode jsonParameters, CancellationToken cancellationToken)
     {
         try
         {
@@ -77,7 +79,7 @@ public class ToolExecutor
         }
     }
 
-    private async Task<JsonObject> ExecutePutAsync(Tool tool, JsonObject jsonParameters, CancellationToken cancellationToken)
+    private async Task<JsonNode> ExecutePutAsync(Tool tool, JsonNode jsonParameters, CancellationToken cancellationToken)
     {
         try
         {
@@ -100,12 +102,17 @@ public class ToolExecutor
         }
     }
 
-    private string ToQueryString(JsonObject jsonParameters)
+    private string ToQueryString(JsonNode jsonParameters)
     {
+        // TODO: What should we do here?
+        if (jsonParameters is not JsonObject jsonObject)
+            return string.Empty;
+
+
         var queryStrings = new Dictionary<string, string>();
 
         // Find requested parameters.
-        foreach (var parameter in jsonParameters)
+        foreach (var parameter in jsonObject)
         {
             string key = parameter.Key;
             string value = string.Empty;
