@@ -1,3 +1,6 @@
+using System.Text.Json.Nodes;
+using Google.Protobuf.WellKnownTypes;
+
 namespace Dr.GeminiClient.Serialization;
 
 /// <summary>
@@ -67,10 +70,12 @@ internal class Content
 internal class Part
 {
     public string? Text { get; init; }
-    public bool Thought { get; init; }
+    public bool? Thought { get; init; }
     public string? ThoughtSignature { get; init; }
 
     public FunctionCall? FunctionCall { get; init; }
+
+    public FunctionResponse? FunctionResponse { get; init; }
 }
 
 internal class FunctionCall
@@ -86,6 +91,12 @@ internal class FunctionCall
 
         return $"{{ FunctionCall {{ Name = {Name}, Args = {flatArgs} }} }}";
     }
+}
+
+internal class FunctionResponse
+{
+    public required string Name { get; init; }
+    public required Struct Response { get; init; }
 }
 
 

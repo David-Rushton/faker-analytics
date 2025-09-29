@@ -1,10 +1,4 @@
-using System.ComponentModel;
 using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using Dr.GeminiClient;
-using Dr.ToolDiscoveryService.Abstractions;
-using Markdig;
 using Spectre.Console.Cli;
 
 namespace Dr.FakerAnalytics.Cli.Commands;
@@ -29,42 +23,58 @@ public class PromptCommand(
         if (tools is not null && tools.Count != 0)
             conversation.Tools = tools;
 
-        await foreach (var response in conversation.Ask(settings.Prompt))
+        try
         {
-            switch (response)
-            {
-                case TextResponse textResponse:
-                    AnsiConsole.MarkupLineInterpolated($"[yellow]{textResponse.Text}[/]");
-                    break;
-
-                case ThoughtResponse thoughtResponse:
-                    AnsiConsole.MarkupLineInterpolated($"[green]{thoughtResponse.Thought}[/]");
-                    break;
-
-                case FunctionCallResponse functionCallResponse:
-                    AnsiConsole.MarkupLineInterpolated($"[purple]{functionCallResponse.Name} {functionCallResponse.GetJsonArgs()}[/]");
-
-                    var tool = tools!.First(t => t.Name == functionCallResponse.Name);
-
-                    if (tool is null)
-                        throw new InvalidOperationException("Unsupported tool requested");
-
-                    var toolResponse = await toolExecutor.ExecuteAsync(
-                        tool,
-                        functionCallResponse.GetJsonArgs(),
-                        CancellationToken.None);
-
-                    // Console.WriteLine(toolResponse);
-
-                    break;
-
-                default:
-                    throw new NotSupportedException($"Unknown response type: {nameof(response)}");
-            }
+            await HandleResponses(conversation.Ask(settings.Prompt));
+        }
+        catch (HttpRequestException e)
+        {
+            AnsiConsole.WriteException(e);
+        }
+        catch (Exception e)
+        {
+            AnsiConsole.WriteException(e);
         }
 
-        AnsiConsole.WriteLine();
-
         return 0;
+
+        async Task HandleResponses(IAsyncEnumerable<Response> responses)
+        {
+            await foreach (var response in responses)
+            {
+                switch (response)
+                {
+                    case TextResponse textResponse:
+                        AnsiConsole.MarkupInterpolated($"[yellow]{textResponse.Text}[/]");
+                        break;
+
+                    case ThoughtResponse thoughtResponse:
+                        AnsiConsole.MarkupLineInterpolated($"[green]{thoughtResponse.Thought}[/]");
+                        break;
+
+                    case FunctionCallResponse functionCallResponse:
+                        AnsiConsole.MarkupLineInterpolated($"[purple]{functionCallResponse.Name} {functionCallResponse.GetJsonArgs()}[/]");
+
+                        var tool = tools!.First(t => t.Name == functionCallResponse.Name);
+
+                        if (tool is null)
+                            throw new InvalidOperationException("Unsupported tool requested");
+
+                        var toolResponse = await toolExecutor.ExecuteAsync(
+                            tool,
+                            functionCallResponse.GetJsonArgs(),
+                            CancellationToken.None);
+
+                        await HandleResponses(conversation.ReplyWithFunctionResult(tool, toolResponse));
+
+                        break;
+
+                    default:
+                        throw new NotSupportedException($"Unknown response type: {nameof(response)}");
+                }
+            }
+
+            AnsiConsole.WriteLine();
+        }
     }
 }

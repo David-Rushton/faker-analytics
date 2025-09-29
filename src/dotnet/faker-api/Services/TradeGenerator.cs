@@ -6,8 +6,8 @@ public class TradeGenerator
 {
     static string[] Venues = ["AXE", "MAJOR", "FAST-SPOT", "PREM-TRADES"];
 
-    const int MinTradesPerPeriod = 5;
-    const int MaxTradesPerPeriod = 50;
+    const int MinTradesPerPeriod = 1;
+    const int MaxTradesPerPeriod = 5;
     const int MinPrice = 10_00;
     const int MaxPrice = 100_00;
     const int MinQuantity = 1_00;
