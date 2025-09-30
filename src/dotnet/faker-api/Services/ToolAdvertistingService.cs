@@ -59,7 +59,7 @@ from must be before until.
 Supported instrumentId, commingleId and deliveryId values are documented in the /api/metadata endpoints.
 """;
         var ohlcvDefinition = new ToolDefinitionBuilder()
-                .WithName("OHLCV")
+                .WithName("get_ohlcv")
                 .WithDescription(OhlcvDescription)
                 .WithParameters(p => p
                     .WithRequiredProperty("from", prop => prop
@@ -104,7 +104,7 @@ Supported instrumentId, commingleId and deliveryId values are documented in the 
 
         var tradesDefinition =
             new ToolDefinitionBuilder()
-                .WithName("Trades")
+                .WithName("get_trades")
                 .WithDescription(tradesDescription)
                 .WithParameters(p => p
                     .WithRequiredProperty("from", prop => prop

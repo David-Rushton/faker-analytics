@@ -1,0 +1,6 @@
+@time_service_HostAddress = http://localhost:5050
+
+GET {{time_service_HostAddress}}/api/now
+Accept: application/json
+
+###

@@ -9,4 +9,9 @@ var fakerApi = builder.AddProject<Projects.faker_api>("faker-api")
     .WithReference(toolDiscoveryService)
     .WithHttpHealthCheck("/health");
 
+var timeService = builder.AddProject<Projects.time_service>("time-service")
+    .WithExternalHttpEndpoints()
+    .WithReference(toolDiscoveryService)
+    .WithHttpHealthCheck("/health");
+
 builder.Build().Run();

@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "faker-servicedefaults", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gemini-client.tests", "src\dotnet\gemini-client.tests\gemini-client.tests.csproj", "{F15F9D9D-85E6-4971-A4FD-40FED9866977}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "time-service", "src\dotnet\time-service\time-service.csproj", "{38D9CDE8-F022-4593-A45B-DAC59F6748B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +145,18 @@ Global
 		{F15F9D9D-85E6-4971-A4FD-40FED9866977}.Release|x64.Build.0 = Release|Any CPU
 		{F15F9D9D-85E6-4971-A4FD-40FED9866977}.Release|x86.ActiveCfg = Release|Any CPU
 		{F15F9D9D-85E6-4971-A4FD-40FED9866977}.Release|x86.Build.0 = Release|Any CPU
+		{38D9CDE8-F022-4593-A45B-DAC59F6748B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38D9CDE8-F022-4593-A45B-DAC59F6748B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38D9CDE8-F022-4593-A45B-DAC59F6748B7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{38D9CDE8-F022-4593-A45B-DAC59F6748B7}.Debug|x64.Build.0 = Debug|Any CPU
+		{38D9CDE8-F022-4593-A45B-DAC59F6748B7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{38D9CDE8-F022-4593-A45B-DAC59F6748B7}.Debug|x86.Build.0 = Debug|Any CPU
+		{38D9CDE8-F022-4593-A45B-DAC59F6748B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38D9CDE8-F022-4593-A45B-DAC59F6748B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38D9CDE8-F022-4593-A45B-DAC59F6748B7}.Release|x64.ActiveCfg = Release|Any CPU
+		{38D9CDE8-F022-4593-A45B-DAC59F6748B7}.Release|x64.Build.0 = Release|Any CPU
+		{38D9CDE8-F022-4593-A45B-DAC59F6748B7}.Release|x86.ActiveCfg = Release|Any CPU
+		{38D9CDE8-F022-4593-A45B-DAC59F6748B7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -158,5 +172,6 @@ Global
 		{51DC390A-DB2E-49AE-BA2A-9AD540E0D988} = {204ECC8A-4C8C-06A8-7EEC-D568B118FA74}
 		{CB96ECE5-809E-4B37-83E4-823890850AFA} = {204ECC8A-4C8C-06A8-7EEC-D568B118FA74}
 		{F15F9D9D-85E6-4971-A4FD-40FED9866977} = {204ECC8A-4C8C-06A8-7EEC-D568B118FA74}
+		{38D9CDE8-F022-4593-A45B-DAC59F6748B7} = {204ECC8A-4C8C-06A8-7EEC-D568B118FA74}
 	EndGlobalSection
 EndGlobal

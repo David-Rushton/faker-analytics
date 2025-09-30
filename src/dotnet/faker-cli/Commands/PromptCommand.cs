@@ -23,6 +23,8 @@ public class PromptCommand(
         if (tools is not null && tools.Count != 0)
             conversation.Tools = tools;
 
+        AnsiConsole.MarkupLineInterpolated($"[purple]Available tools: {string.Join(", ", tools!.Select(t => t.Name))}.[/]");
+
         try
         {
             await HandleResponses(conversation.Ask(settings.Prompt));
