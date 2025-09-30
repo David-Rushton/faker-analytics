@@ -19,6 +19,7 @@
     <ProjectReference Include="..\faker-api\faker-api.csproj" />
     <ProjectReference Include="..\tool-discovery-service\tool-discovery-service.csproj" />
     <ProjectReference Include="..\time-service\time-service.csproj" />
+    <ProjectReference Include="..\faker-meta\faker-meta.csproj" />
   </ItemGroup>
 
 </Project>

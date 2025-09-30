@@ -7,7 +7,7 @@ public static class WebApplicationExtensions
     public static WebApplication EnableEnvironmentSpecifics(this WebApplication app)
     {
         var logger = app.Logger;
-        logger.LogInformation("Taker Analytics API starting up...");
+        logger.LogInformation("Faker Analytics API starting up...");
         logger.LogInformation("Environment: {Environment}", app.Environment.EnvironmentName);
 
         if (app.Environment.IsDevelopment())

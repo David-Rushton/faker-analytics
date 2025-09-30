@@ -1,5 +1,4 @@
-namespace Dr.FakerAnalytics.Api;
-
+namespace Dr.FakerAnalytics.Api.Services;
 public class ToolAdvertisingService(
     ILogger<ToolAdvertisingService> logger,
     IHttpClientFactory httpClientFactory,
@@ -56,7 +55,7 @@ Returns open high low close volume (OHLCV) candles.
 
 from must be before until.
 
-Supported instrumentId, commingleId and deliveryId values are documented in the /api/metadata endpoints.
+Supported instrumentId, commingleId and deliveryId values are documented in the /api/instrument, /api/deliveries and /api/instrument/deliveries endpoints.
 """;
         var ohlcvDefinition = new ToolDefinitionBuilder()
                 .WithName("get_ohlcv")
@@ -99,7 +98,7 @@ Returns trades.
 
 from must be before until.
 
-Supported instrumentId, commingleId and deliveryId values are documented in the /api/metadata endpoints.
+Supported instrumentId, commingleId and deliveryId values are documented in the /api/instrument, /api/deliveries and /api/instrument/deliveries endpoints.
 """;
 
         var tradesDefinition =

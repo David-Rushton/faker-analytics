@@ -1,11 +1,11 @@
-using Dr.TimeService.Extensions;
+using System.ComponentModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .AddOpenApi()
     .AddEndpointsApiExplorer()
-    .AddNowServices();
+    .AddFakerMetaServices();
 
 builder.AddServiceDefaults();
 
@@ -14,6 +14,6 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 app.MapDefaultEndpoints();
 app.EnableEnvironmentSpecifics();
-app.AddNowEndpoints();
+app.AddFakerMetaEndpoints();
 
 app.Run();
