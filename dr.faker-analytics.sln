@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "time-service", "src\dotnet\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "faker-meta", "src\dotnet\faker-meta\faker-meta.csproj", "{B22B3980-03C2-4DF2-B5E4-B8F6753C7446}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "charting-service", "src\dotnet\charting-service\charting-service.csproj", "{C9A39C2F-DAF5-4171-BB8B-2AA3B86C8621}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -171,6 +173,18 @@ Global
 		{B22B3980-03C2-4DF2-B5E4-B8F6753C7446}.Release|x64.Build.0 = Release|Any CPU
 		{B22B3980-03C2-4DF2-B5E4-B8F6753C7446}.Release|x86.ActiveCfg = Release|Any CPU
 		{B22B3980-03C2-4DF2-B5E4-B8F6753C7446}.Release|x86.Build.0 = Release|Any CPU
+		{C9A39C2F-DAF5-4171-BB8B-2AA3B86C8621}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9A39C2F-DAF5-4171-BB8B-2AA3B86C8621}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9A39C2F-DAF5-4171-BB8B-2AA3B86C8621}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C9A39C2F-DAF5-4171-BB8B-2AA3B86C8621}.Debug|x64.Build.0 = Debug|Any CPU
+		{C9A39C2F-DAF5-4171-BB8B-2AA3B86C8621}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C9A39C2F-DAF5-4171-BB8B-2AA3B86C8621}.Debug|x86.Build.0 = Debug|Any CPU
+		{C9A39C2F-DAF5-4171-BB8B-2AA3B86C8621}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9A39C2F-DAF5-4171-BB8B-2AA3B86C8621}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9A39C2F-DAF5-4171-BB8B-2AA3B86C8621}.Release|x64.ActiveCfg = Release|Any CPU
+		{C9A39C2F-DAF5-4171-BB8B-2AA3B86C8621}.Release|x64.Build.0 = Release|Any CPU
+		{C9A39C2F-DAF5-4171-BB8B-2AA3B86C8621}.Release|x86.ActiveCfg = Release|Any CPU
+		{C9A39C2F-DAF5-4171-BB8B-2AA3B86C8621}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -188,5 +202,6 @@ Global
 		{F15F9D9D-85E6-4971-A4FD-40FED9866977} = {204ECC8A-4C8C-06A8-7EEC-D568B118FA74}
 		{38D9CDE8-F022-4593-A45B-DAC59F6748B7} = {204ECC8A-4C8C-06A8-7EEC-D568B118FA74}
 		{B22B3980-03C2-4DF2-B5E4-B8F6753C7446} = {204ECC8A-4C8C-06A8-7EEC-D568B118FA74}
+		{C9A39C2F-DAF5-4171-BB8B-2AA3B86C8621} = {204ECC8A-4C8C-06A8-7EEC-D568B118FA74}
 	EndGlobalSection
 EndGlobal

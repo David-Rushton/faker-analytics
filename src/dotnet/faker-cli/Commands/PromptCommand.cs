@@ -23,6 +23,15 @@ public class PromptCommand(
         if (tools is not null && tools.Count != 0)
             conversation.Tools = tools;
 
+        conversation.SystemInstruction = """
+You are an agent.  Your purpose is to help the user investigate the energy commodities market.  Using
+the tools provided.
+
+When constructing function calls you **must** format any parameters called `from` or `until` in strict
+RFC3339 format.  Do not include any spaces or non standard ASCII characters.  There is no need to
+provide anything below a second granularity.
+""";
+
         AnsiConsole.MarkupLineInterpolated($"[purple]Available tools: {string.Join(", ", tools!.Select(t => t.Name))}.[/]");
 
         try
@@ -55,7 +64,9 @@ public class PromptCommand(
                         break;
 
                     case FunctionCallResponse functionCallResponse:
-                        AnsiConsole.MarkupLineInterpolated($"[purple]{functionCallResponse.Name} {functionCallResponse.GetJsonArgs()}[/]");
+                        // AnsiConsole.Markup("[purple]");
+                        AnsiConsole.WriteLine($"{functionCallResponse.Name} {functionCallResponse.GetJsonArgs()}");
+                        // AnsiConsole.Markup("[/]");
 
                         var tool = tools!.First(t => t.Name == functionCallResponse.Name);
 

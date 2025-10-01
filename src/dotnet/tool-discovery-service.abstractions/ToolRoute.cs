@@ -11,4 +11,5 @@ public class ToolRoute
 {
     public required HttpRequestMethod HttpRequestMethod { get; init; }
     public required Uri Uri { get; init; }
+    public bool RequiresGenAiKey { get; init; }
 }

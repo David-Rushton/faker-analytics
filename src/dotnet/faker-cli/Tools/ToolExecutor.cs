@@ -1,13 +1,15 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json.Nodes;
+using Microsoft.Extensions.Primitives;
 
 namespace Dr.FakerAnalytics.Cli.Tools;
 
 /// <summary>
 /// Executes any tool registered with the Tool Discovery Service.
 /// </summary>
-public class ToolExecutor
+public class ToolExecutor(IOptions<GenAiOptions> options)
 {
     private const string jsonTrue = "true";
     private const string jsonFalse = "false";
@@ -22,22 +24,43 @@ public class ToolExecutor
     };
 
     // TODO: Maybe execute tool by name -> fetch from disco?
-    public async Task<JsonNode> ExecuteAsync(Tool tool, JsonNode jsonParameters, CancellationToken cancellationToken) =>
-        await (tool.ToolRoute.HttpRequestMethod switch
-        {
-            HttpRequestMethod.Get => ExecuteGetAsync(tool, jsonParameters, cancellationToken),
-            HttpRequestMethod.Post => ExecutePostAsync(tool, jsonParameters, cancellationToken),
-            HttpRequestMethod.Put => ExecutePutAsync(tool, jsonParameters, cancellationToken),
-            _ => throw new ArgumentOutOfRangeException(nameof(ToolRoute.HttpRequestMethod))
-        });
+    public async Task<JsonNode> ExecuteAsync(Tool tool, JsonNode jsonParameters, CancellationToken cancellationToken)
+    {
+
+        if (tool.ToolRoute.RequiresGenAiKey)
+            if (!_httpClient.DefaultRequestHeaders.Contains("X-Goog-Api-Key"))
+                _httpClient.DefaultRequestHeaders.Add("X-Goog-Api-Key", options.Value.ApiKey);
+
+        return await (tool.ToolRoute.HttpRequestMethod switch
+                {
+                    HttpRequestMethod.Get => ExecuteGetAsync(tool, jsonParameters, cancellationToken),
+                    HttpRequestMethod.Post => ExecutePostAsync(tool, jsonParameters, cancellationToken),
+                    HttpRequestMethod.Put => ExecutePutAsync(tool, jsonParameters, cancellationToken),
+                    _ => throw new ArgumentOutOfRangeException(nameof(ToolRoute.HttpRequestMethod))
+                });
+    }
 
     private async Task<JsonNode> ExecuteGetAsync(Tool tool, JsonNode jsonParameters, CancellationToken cancellationToken)
     {
 
         try
         {
-            var queryString = ToQueryString(jsonParameters);
-            var response = await _httpClient.GetAsync($"{tool.ToolRoute.Uri}{queryString}");
+            var uri = tool.ToolRoute.Uri.ToString();
+
+            // Extract route parameters.
+            var parameters = ToDictionary(jsonParameters);
+            foreach (var (key, value) in parameters)
+            {
+                if (uri.Contains($"{{key}}"))
+                {
+                    uri.Replace($"{{key}}", value);
+                    parameters.Remove(key);
+                }
+            }
+
+            // Convert remaining params to a query string.
+            var queryString = ToQueryString(parameters);
+            var response = await _httpClient.GetAsync($"{uri}{queryString}", cancellationToken);
 
             response.EnsureSuccessStatusCode();
 
@@ -102,14 +125,14 @@ public class ToolExecutor
         }
     }
 
-    private string ToQueryString(JsonNode jsonParameters)
+    // TODO: WebUtility.UrlEncode().
+    private Dictionary<string, string> ToDictionary(JsonNode jsonParameters)
     {
         // TODO: What should we do here?
         if (jsonParameters is not JsonObject jsonObject)
-            return string.Empty;
+            return new();
 
-
-        var queryStrings = new Dictionary<string, string>();
+        var parameters = new Dictionary<string, string>();
 
         // Find requested parameters.
         foreach (var parameter in jsonObject)
@@ -129,19 +152,23 @@ public class ToolExecutor
                     _ => throw new ArgumentOutOfRangeException($"GET tools do not support parameter types of {parameter.Value.GetValueKind()}.")
                 };
 
-            if (queryStrings.ContainsKey(key))
+            if (parameters.ContainsKey(key))
             {
-                queryStrings[key] += $",{value}";
+                parameters[key] += $",{value}";
                 continue;
             }
 
-            queryStrings[key] = value;
+            parameters[key] = value;
         }
 
-        // Convert to a query string.
-        if (queryStrings.Count == 0)
+        return parameters;
+    }
+
+    private string ToQueryString(Dictionary<string, string> parameters)
+    {
+        if (parameters.Count == 0)
             return string.Empty;
 
-        return "?" + string.Join("&", queryStrings.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+        return "?" + string.Join("&", parameters.Select(kvp => $"{kvp.Key}={kvp.Value}"));
     }
 }

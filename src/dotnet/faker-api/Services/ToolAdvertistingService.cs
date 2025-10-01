@@ -63,10 +63,10 @@ Supported instrumentId, commingleId and deliveryId values are documented in the 
                 .WithParameters(p => p
                     .WithRequiredProperty("from", prop => prop
                         .WithType("string")
-                        .WithDescription("Inclusive start date time.  Use RFC3339 format.  Must be before until."))
+                        .WithDescription("Inclusive start date time.  Must be RFC3339 formatted.  Must be before until."))
                     .WithRequiredProperty("until", prop => prop
                         .WithType("string")
-                        .WithDescription("Exclusive end date time.  Use RFC3339 format.  Must be after from."))
+                        .WithDescription("Exclusive end date time.  Must be RFC3339 formatted.  Must be after from."))
                     .WithProperty("instrumentId", prop => prop
                         .WithType("number")
                         .WithDescription("The instrument to query.  Cannot be combined with commingleId."))

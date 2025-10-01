@@ -20,6 +20,7 @@
     <ProjectReference Include="..\tool-discovery-service\tool-discovery-service.csproj" />
     <ProjectReference Include="..\time-service\time-service.csproj" />
     <ProjectReference Include="..\faker-meta\faker-meta.csproj" />
+    <ProjectReference Include="..\charting-service\charting-service.csproj" />
   </ItemGroup>
 
 </Project>

@@ -153,6 +153,16 @@ public partial class Conversation
             var jsonContent = new JsonObject
             {
                 ["contents"] = GetHistoryAsJson(),
+                ["system_instruction"] = new JsonObject
+                {
+                    ["parts"] = new JsonArray
+                    {
+                        new JsonObject
+                        {
+                            ["text"] = SystemInstruction
+                        }
+                    }
+                },
                 ["generationConfig"] = new JsonObject
                 {
                     ["thinkingConfig"] = new JsonObject

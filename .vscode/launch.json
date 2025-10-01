@@ -17,7 +17,7 @@
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/src/dotnet/faker-cli/bin/Debug/net10.0/faker-cli.dll",
             "args": [
-                "prompt", "\"Please show me the trades for today.  I am interested in german peek instrument.  And deliver 2025-Jan.  The results should be formatted as a markdown table.\""
+                "prompt", "\" I would like to see todays trades for UK Baseload, delivering in Mar 26.  Can you plot the data in a webpage?\""
             ],
             "envFile": "${workspaceFolder}/.env",
             "cwd": "${workspaceFolder}",

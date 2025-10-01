@@ -45,7 +45,7 @@ Returns an array containing all instruments.
 
 Each returned instrument has an id, name and description.
 """)
-        .Produces<IEnumerable<Instrument[]>>();
+        .Produces<IEnumerable<Instrument>>();
 
         return app;
     }
@@ -70,7 +70,7 @@ point in time, or over some window (example delivering daily every working day o
 
 Each returned delivery has an id, name and description.
 """)
-        .Produces<IEnumerable<Delivery[]>>();
+        .Produces<IEnumerable<Delivery>>();
 
         return app;
     }
@@ -94,7 +94,7 @@ Each row contains and instrumentId and an array of all the linked deliveryIds.
 
 Every instrument is linked to at least 1 delivery.
 """)
-        .Produces<IEnumerable<InstrumentDeliveries[]>>();
+        .Produces<IEnumerable<InstrumentDeliveries>>();
 
         return app;
     }

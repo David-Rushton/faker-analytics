@@ -21,5 +21,9 @@ var timeService = builder.AddProject<Projects.time_service>("time-service", laun
     .WithReference(toolDiscoveryService)
     .WithHttpHealthCheck("/health");
 
+var chartingService = builder.AddProject<Projects.charting_service>("charting-service", launchProfileName: "http")
+    .WithExternalHttpEndpoints()
+    .WithReference(toolDiscoveryService)
+    .WithHttpHealthCheck("/health");
 
 builder.Build().Run();
